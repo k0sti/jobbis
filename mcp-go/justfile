@@ -1,3 +1,7 @@
+# Show available commands
+default:
+	@just --list
+
 # Build the binary
 build:
 	go build -o bin/tyomarkkinatori-mcp ./cmd/tyomarkkinatori-mcp

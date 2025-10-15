@@ -1,0 +1,31 @@
+{
+  "id": "test-job-1",
+  "ilmoitusId": "test-job-1",
+  "otsikko": "Senior Ohjelmistokehittäjä",
+  "ammattinimike": "Senior Ohjelmistokehittäjä",
+  "tyonantaja": "TechFinn Oy",
+  "sijainti": {
+    "kunta": "Helsinki",
+    "maakunta": "Uusimaa"
+  },
+  "tyosuhteenLaji": "01",
+  "julkaisupvm": "2024-03-15T08:00:00Z",
+  "luontipvm": "2024-03-15T08:00:00Z",
+  "kuvaus": "Etsimme kokeneita ohjelmistokehittäjiä kehittämään moderneja web-sovelluksia. Työssä käytät uusimpia teknologioita ja työskentelet kansainvälisen tiimin kanssa.",
+  "tehtavakuvaus": "Etsimme kokeneita ohjelmistokehittäjiä",
+  "vaatimukset": [
+    "5+ vuotta kokemusta ohjelmistokehityksestä",
+    "Vahva osaaminen Go tai Java -kielestä",
+    "Kokemus pilvipalveluista (AWS/Azure/GCP)"
+  ],
+  "edut": [
+    "Kilpailukykyinen palkka",
+    "Etätyömahdollisuus",
+    "Kattavat työterveyspalvelut"
+  ],
+  "palkka": "4500-6500 EUR/kk",
+  "hakuaika": {
+    "paattyy": "2024-04-15T23:59:59Z"
+  },
+  "url": "https://tyomarkkinatori.fi/tyopaikat/test-job-1"
+}

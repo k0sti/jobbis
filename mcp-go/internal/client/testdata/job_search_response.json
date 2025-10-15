@@ -1,0 +1,36 @@
+{
+  "tulokset": [
+    {
+      "id": "test-job-1",
+      "ilmoitusId": "test-job-1",
+      "otsikko": "Senior Ohjelmistokehittäjä",
+      "ammattinimike": "Senior Ohjelmistokehittäjä",
+      "tyonantaja": "TechFinn Oy",
+      "sijainti": {
+        "kunta": "Helsinki",
+        "maakunta": "Uusimaa"
+      },
+      "tyosuhteenLaji": "01",
+      "julkaisupvm": "2024-03-15T08:00:00Z",
+      "luontipvm": "2024-03-15T08:00:00Z",
+      "kuvaus": "Etsimme kokeneita ohjelmistokehittäjiä kehittämään moderneja web-sovelluksia",
+      "tehtavakuvaus": "Etsimme kokeneita ohjelmistokehittäjiä",
+      "hakuaika": {
+        "paattyy": "2024-04-15T23:59:59Z"
+      }
+    },
+    {
+      "id": "test-job-2",
+      "ilmoitusId": "test-job-2",
+      "otsikko": "Full Stack Developer",
+      "tyonantaja": "Digital Solutions Finland",
+      "sijainti": {
+        "kunta": "Tampere",
+        "maakunta": "Pirkanmaa"
+      },
+      "tyosuhteenLaji": "02",
+      "julkaisupvm": "2024-03-14T10:30:00Z",
+      "kuvaus": "Haemme full stack kehittäjää kasvavaan tiimiimme"
+    }
+  ]
+}

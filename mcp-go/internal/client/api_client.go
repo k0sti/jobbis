@@ -9,22 +9,26 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/yourusername/tyomarkkinatori-mcp/internal/auth"
 	"github.com/yourusername/tyomarkkinatori-mcp/internal/models"
 	"github.com/yourusername/tyomarkkinatori-mcp/internal/utils"
 )
 
+// OAuthClient is the interface for OAuth authentication
+type OAuthClient interface {
+	GetAccessToken(ctx context.Context) (string, error)
+}
+
 // Client handles API requests to Työmarkkinatori
 type Client struct {
 	httpClient  *http.Client
-	oauthClient *auth.Client
+	oauthClient OAuthClient
 	rateLimiter *utils.RateLimiter
 	cache       *utils.Cache
 	baseURL     string
 }
 
 // NewClient creates a new API client
-func NewClient(oauthClient *auth.Client, baseURL string, rateLimitRPS float64, rateLimitBurst int, cacheTTL time.Duration) *Client {
+func NewClient(oauthClient OAuthClient, baseURL string, rateLimitRPS float64, rateLimitBurst int, cacheTTL time.Duration) *Client {
 	return &Client{
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
