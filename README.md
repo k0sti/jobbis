@@ -5,7 +5,7 @@ This repository contains tools and integrations for accessing the Finnish job ma
 ## 📁 Project Structure
 
 ```
-job/
+jobbis/
 ├── mcp/                    # Työmarkkinatori MCP Server
 │   ├── src/               # Source code
 │   ├── doc/               # Documentation
@@ -19,6 +19,8 @@ job/
 ### [Työmarkkinatori MCP Server](mcp/)
 
 MCP (Model Context Protocol) server that enables AI assistants to search and retrieve job listings from the Finnish job market using the official Työmarkkinatori REST API.
+
+**Status:** Co-created with Claude Code. Implementation complete but not yet tested.
 
 **Features:**
 - 🔐 OAuth 2.0 authentication
@@ -52,37 +54,28 @@ See [API Credentials Setup Guide](mcp/doc/api_credentials_guide.md) for detailed
 cd mcp
 ```
 
-### 2. Install Dependencies
+### 2. Build
 
 ```bash
-npm install
+just build
+# or: go build -o bin/tyomarkkinatori-mcp ./cmd/tyomarkkinatori-mcp
 ```
 
-### 3. Configure Credentials
-
-Create `.env` file:
-```bash
-CLIENT_ID=your-client-id
-CLIENT_SECRET=your-client-secret
-TENANT_ID=your-tenant-id
-API_BASE_URL=https://integraatiot.tyomarkkinatori.fi
-```
-
-### 4. Build and Run
+### 3. Run
 
 ```bash
-npm run build
-npm start
+./bin/tyomarkkinatori-mcp
 ```
 
-### 5. Configure MCP
+### 4. Configure MCP
+
+Add to Claude Desktop config (`claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
     "tyomarkkinatori": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp/dist/index.js"],
+      "command": "/absolute/path/to/mcp/bin/tyomarkkinatori-mcp",
       "env": {
         "CLIENT_ID": "your-client-id",
         "CLIENT_SECRET": "your-client-secret",
@@ -93,20 +86,21 @@ npm start
 }
 ```
 
+See [MCP Server Documentation](mcp/README.md) for detailed configuration options.
+
 ## 📚 Documentation
 
 ### General
 - [Project README](README.md) - This file
-- [Documentation Index](mcp/doc/INDEX.md) - Complete documentation map
+- [MCP Server Documentation](mcp/README.md) - Complete server documentation
 
 ### Setup & Configuration
 - [API Credentials Guide](mcp/doc/api_credentials_guide.md) - How to get API access
-- [Getting Started](mcp/doc/getting_started.md) - Step-by-step implementation
-- [Environment Setup](mcp/.env.example) - Configuration template
 
 ### Technical Documentation
 - [Architecture](mcp/doc/architecture.md) - System design and decisions
-- [Implementation](mcp/doc/implementation.md) - Detailed code guide
+- [Implementation (Go)](mcp/doc/implementation-go.md) - Go implementation guide
+- [Implementation (TypeScript)](mcp/doc/implementation-typescript.md) - TypeScript reference implementation
 - [API Reference](mcp/doc/api_reference.md) - Tool specifications
 
 ## 🔧 MCP Tools Available

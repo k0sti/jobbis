@@ -282,9 +282,9 @@ interface SearchParams {
 ## Security Considerations
 
 1. **Credential Management:**
-   - Store API credentials in environment variables only
+   - Store API credentials via MCP client configuration
    - Never commit credentials to version control
-   - Use `.env` files for local development
+   - Use MCP config `env` section for all deployments
    - Secure credential storage in production
 
 2. **Token Security:**

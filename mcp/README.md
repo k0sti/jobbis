@@ -36,7 +36,7 @@ Seems legit, but has not been tested.
    - You'll receive: `CLIENT_ID`, `CLIENT_SECRET`, `TENANT_ID`
    - First for QA environment, then production after testing
 
-See [Getting Started Guide](doc/getting_started.md) for detailed registration process.
+See [API Credentials Guide](doc/api_credentials_guide.md) for detailed registration process.
 
 ## Quick Start
 
@@ -44,31 +44,25 @@ See [Getting Started Guide](doc/getting_started.md) for detailed registration pr
 
 ```bash
 cd mcp
-npm install
+go mod download
 ```
 
 ### Configuration
 
-1. Create `.env` file:
+1. Build:
 ```bash
-CLIENT_ID=your-client-id-here
-CLIENT_SECRET=your-client-secret-here
-TENANT_ID=your-tenant-id-here
-API_BASE_URL=https://integraatiot.tyomarkkinatori.fi
+just build
+# or: go build -o bin/tyomarkkinatori-mcp ./cmd/tyomarkkinatori-mcp
 ```
 
-2. Build:
-```bash
-npm run build
-```
+2. Configure Claude Desktop (`claude_desktop_config.json`):
 
-3. Add to Claude Desktop configuration (`claude_desktop_config.json`):
+**Required Configuration:**
 ```json
 {
   "mcpServers": {
     "tyomarkkinatori": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp/dist/index.js"],
+      "command": "/absolute/path/to/mcp/bin/tyomarkkinatori-mcp",
       "env": {
         "CLIENT_ID": "your-client-id",
         "CLIENT_SECRET": "your-client-secret",
@@ -79,10 +73,39 @@ npm run build
 }
 ```
 
+**Optional Environment Variables:**
+| Variable | Default | Description |
+|----------|---------|-------------|
+| API_BASE_URL | `https://integraatiot.tyomarkkinatori.fi` | API endpoint (use `https://integraatiot-qa.tyomarkkinatori.fi` for testing) |
+| CACHE_TTL_MS | `900000` | Cache TTL in milliseconds (15 minutes) |
+| RATE_LIMIT_RPS | `2` | Requests per second |
+| RATE_LIMIT_BURST | `10` | Maximum burst capacity |
+
+**Full Configuration Example:**
+```json
+{
+  "mcpServers": {
+    "tyomarkkinatori": {
+      "command": "/absolute/path/to/mcp/bin/tyomarkkinatori-mcp",
+      "env": {
+        "CLIENT_ID": "your-client-id",
+        "CLIENT_SECRET": "your-client-secret",
+        "TENANT_ID": "your-tenant-id",
+        "API_BASE_URL": "https://integraatiot.tyomarkkinatori.fi",
+        "CACHE_TTL_MS": "900000",
+        "RATE_LIMIT_RPS": "2",
+        "RATE_LIMIT_BURST": "10"
+      }
+    }
+  }
+}
+```
+
 ### Development
 
 ```bash
-npm run dev
+just run
+# or: go run ./cmd/tyomarkkinatori-mcp
 ```
 
 ## Tools
@@ -124,15 +147,16 @@ List available categories, employment types, and regions.
 ## Documentation
 
 - [Architecture & Design](doc/architecture.md) - System architecture and design decisions
-- [Implementation Specification](doc/implementation.md) - Detailed implementation guide
+- [Implementation (Go)](doc/implementation-go.md) - Go implementation guide
+- [Implementation (TypeScript)](doc/implementation-typescript.md) - TypeScript reference implementation
 - [API Reference](doc/api_reference.md) - Complete tool reference and examples
 
 ## Technology Stack
 
-- **Runtime:** Node.js 18+
-- **Language:** TypeScript 5+
-- **MCP SDK:** @modelcontextprotocol/sdk
-- **HTTP Client:** axios
+- **Language:** Go 1.21+
+- **MCP SDK:** github.com/modelcontextprotocol/go-sdk
+- **HTTP Client:** net/http (standard library)
+- **OAuth:** golang.org/x/oauth2
 - **Authentication:** OAuth 2.0 (Microsoft Identity Platform)
 - **API:** Työmarkkinatori REST API
 
@@ -140,44 +164,20 @@ List available categories, employment types, and regions.
 
 ```
 mcp/
-├── src/
-│   ├── index.ts              # Entry point
-│   ├── server.ts             # MCP server
+├── cmd/
+│   └── tyomarkkinatori-mcp/
+│       └── main.go           # Entry point
+├── internal/
+│   ├── server/               # MCP server
 │   ├── tools/                # Tool handlers
 │   ├── auth/                 # OAuth 2.0 authentication
 │   ├── client/               # REST API client
 │   ├── models/               # Data models
-│   └── utils/                # Utilities
+│   ├── utils/                # Utilities
+│   └── config/               # Configuration
 ├── doc/                      # Documentation
-├── tests/                    # Tests
-├── .env.example              # Example environment variables
-└── package.json
-```
-
-## Development
-
-### Build
-
-```bash
-npm run build
-```
-
-### Test
-
-```bash
-npm test
-```
-
-### Lint
-
-```bash
-npm run lint
-```
-
-### Format
-
-```bash
-npm run format
+├── go.mod                    # Go module definition
+└── justfile                  # Build automation
 ```
 
 ## Usage Examples
@@ -287,8 +287,7 @@ Monitor Työmarkkinatori API for changes:
 
 ### Credential Management
 
-- Store credentials securely
-- Never commit `.env` to version control
+- Store credentials in MCP client config
 - Rotate credentials periodically
 - Monitor OAuth token expiration
 
@@ -297,8 +296,8 @@ Monitor Työmarkkinatori API for changes:
 Keep dependencies updated:
 
 ```bash
-npm update
-npm audit fix
+just update
+# or: go get -u ./... && go mod tidy
 ```
 
 ## License

@@ -78,34 +78,31 @@ QA_API_URL: https://integraatiot-qa.tyomarkkinatori.fi
 
 ## Step 3: Configure QA Environment
 
-### Create `.env` File
+### Configure Claude Desktop
 
-```bash
-cd mcp
-cp .env.example .env
+Add to Claude Desktop configuration (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "tyomarkkinatori": {
+      "command": "/absolute/path/to/mcp/bin/tyomarkkinatori-mcp",
+      "env": {
+        "CLIENT_ID": "your-qa-client-id",
+        "CLIENT_SECRET": "your-qa-client-secret",
+        "TENANT_ID": "your-qa-tenant-id",
+        "API_BASE_URL": "https://integraatiot-qa.tyomarkkinatori.fi"
+      }
+    }
+  }
+}
 ```
 
-Edit `.env`:
-```bash
-# QA Environment Credentials
-CLIENT_ID=your-qa-client-id
-CLIENT_SECRET=your-qa-client-secret
-TENANT_ID=your-qa-tenant-id
-
-# QA API Endpoint
-API_BASE_URL=https://integraatiot-qa.tyomarkkinatori.fi
-
-# Settings
-CACHE_TTL_MS=900000
-RATE_LIMIT_RPS=2
-RATE_LIMIT_BURST=10
-NODE_ENV=development
-```
-
-### Test Configuration
+### Build and Test
 
 ```bash
-npm run dev
+just build
+just run
 ```
 
 If successful, you should see:
@@ -194,40 +191,39 @@ PROD_TENANT_ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 PROD_API_URL: https://integraatiot.tyomarkkinatori.fi
 ```
 
-### Update `.env` for Production
+### Update Claude Desktop Configuration
 
-```bash
-# Production Credentials
-CLIENT_ID=your-prod-client-id
-CLIENT_SECRET=your-prod-client-secret
-TENANT_ID=your-prod-tenant-id
+Update `claude_desktop_config.json` with production credentials:
 
-# Production API Endpoint
-API_BASE_URL=https://integraatiot.tyomarkkinatori.fi
-
-# Production Settings
-CACHE_TTL_MS=900000
-RATE_LIMIT_RPS=2
-RATE_LIMIT_BURST=10
-NODE_ENV=production
+```json
+{
+  "mcpServers": {
+    "tyomarkkinatori": {
+      "command": "/absolute/path/to/mcp/bin/tyomarkkinatori-mcp",
+      "env": {
+        "CLIENT_ID": "your-prod-client-id",
+        "CLIENT_SECRET": "your-prod-client-secret",
+        "TENANT_ID": "your-prod-tenant-id",
+        "API_BASE_URL": "https://integraatiot.tyomarkkinatori.fi"
+      }
+    }
+  }
+}
 ```
 
-### Deploy to Production
+### Start Using Production
 
-```bash
-npm run build
-npm start
-```
+Restart Claude Desktop to load the new configuration.
 
 ## Security Best Practices
 
 ### Credential Storage
 
 ✅ **DO:**
-- Store credentials in `.env` file
-- Add `.env` to `.gitignore`
-- Use environment variables in production
+- Store credentials in MCP client configuration
+- Use environment variables via MCP client config
 - Rotate credentials periodically
+- Keep MCP config file secure
 
 ❌ **DON'T:**
 - Commit credentials to git
@@ -259,7 +255,7 @@ Rotate credentials:
 **Solutions:**
 1. Verify credentials are correct
 2. Check if credentials are for correct environment (QA vs Production)
-3. Ensure no extra spaces in `.env` file
+3. Ensure no extra spaces in MCP config
 4. Verify `TENANT_ID` is correct
 
 **Test credentials separately:**
@@ -302,7 +298,7 @@ curl -X POST "https://login.microsoftonline.com/$TENANT_ID/oauth2/v2.0/token" \
 **Problem:** Too many requests error
 
 **Solution:**
-1. Increase `RATE_LIMIT_RPS` in `.env`
+1. Increase `RATE_LIMIT_RPS` in MCP config
 2. Check if cache is working properly
 3. Review API usage patterns
 4. Contact KEHA Centre about quota increase
@@ -359,12 +355,11 @@ Before going to production:
 
 Once credentials are configured:
 
-1. Review [Getting Started Guide](getting_started.md) for implementation
+1. Follow [Implementation Guide (Go)](implementation-go.md) for development
 2. Read [API Reference](api_reference.md) for tool usage
 3. Check [Architecture Document](architecture.md) for system design
-4. Follow [Implementation Guide](implementation.md) for development
 
 ---
 
-*Last Updated: 2024-10-15*
+*Last Updated: 2025-10-15*
 *For the latest API documentation, visit Työmarkkinatori or contact KEHA Centre*

@@ -8,8 +8,6 @@
 - **Language:** TypeScript 5+
 - **MCP SDK:** @modelcontextprotocol/sdk
 - **HTTP Client:** axios
-- **OAuth Library:** @azure/msal-node (Microsoft Authentication Library)
-- **Environment:** dotenv (for credential management)
 - **Build Tool:** esbuild or tsc
 - **Testing:** vitest or jest
 - **Linting:** eslint + prettier
@@ -115,7 +113,7 @@ export class TyomarkkinatoriServer {
       tools: [
         {
           name: "search_jobs",
-          description: "Search for job listings on Työmarkkinatori.fi",
+          description: "Search for job listings on Työmarkkinatori.fi using the official API",
           inputSchema: {
             type: "object",
             properties: {
@@ -127,22 +125,41 @@ export class TyomarkkinatoriServer {
                 type: "string",
                 description: "Location or region (e.g., Helsinki, Tampere)",
               },
-              category: {
+              occupation_group: {
                 type: "string",
-                description: "Job category or industry",
+                description: "ESCO occupation group code (e.g., 2512 for Software developers)",
               },
-              employment_type: {
+              employer_type: {
                 type: "string",
-                description: "Employment type (kokoaikainen, osa-aikainen, määräaikainen)",
+                description: "Type of employer",
+                enum: ["company", "public", "nonprofit"],
+              },
+              working_hours: {
+                type: "string",
+                description: "Working hours type",
+                enum: ["full-time", "part-time"],
+              },
+              duration: {
+                type: "string",
+                description: "Employment duration",
+                enum: ["permanent", "temporary"],
               },
               published_after: {
                 type: "string",
                 description: "ISO date string (e.g., 2024-01-01)",
               },
-              limit: {
+              language: {
+                type: "string",
+                description: "Language for results (default: fi)",
+                enum: ["fi", "sv", "en"],
+              },
+              page: {
                 type: "number",
-                description: "Maximum results to return (default: 20, max: 100)",
-                default: 20,
+                description: "Page number for pagination (0-based, default: 0)",
+              },
+              page_size: {
+                type: "number",
+                description: "Results per page (100-500, default: 100)",
               },
             },
           },
@@ -263,10 +280,6 @@ export class OAuthClient {
 ### 4. Configuration (config.ts)
 
 ```typescript
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
 export const config = {
   // OAuth 2.0 credentials
   clientId: process.env.CLIENT_ID || "",
@@ -767,97 +780,9 @@ export interface FilterOptions {
 }
 ```
 
-## Testing Strategy
+## MCP Client Configuration
 
-### Unit Tests
-- Test individual functions (validators, parsers, formatters)
-- Mock external dependencies
-- Test error handling
+See [mcp/README.md](../README.md) for complete MCP client configuration instructions.
 
-### Integration Tests
-- Test tool handlers with mocked API responses
-- Test cache behavior
-- Test rate limiter
+**Note:** This is a TypeScript/Node.js implementation reference. The project is implemented in Go. See [implementation-go.md](implementation-go.md) for the actual implementation.
 
-### E2E Tests
-- Test against QA API environment
-- Validate OAuth authentication flow
-- Test complete workflows
-- Verify API response parsing
-
-## Deployment
-
-### Development
-```bash
-npm install
-npm run dev
-```
-
-### Production
-```bash
-npm run build
-npm start
-```
-
-### Environment Variables
-Create a `.env` file:
-```bash
-# OAuth 2.0 Credentials (from KEHA Centre)
-CLIENT_ID=your-client-id
-CLIENT_SECRET=your-client-secret
-TENANT_ID=your-tenant-id
-
-# API Configuration
-API_BASE_URL=https://integraatiot.tyomarkkinatori.fi
-# For testing: https://integraatiot-qa.tyomarkkinatori.fi
-
-# Optional settings
-CACHE_TTL_MS=900000
-RATE_LIMIT_RPS=2
-RATE_LIMIT_BURST=10
-```
-
-### MCP Client Configuration
-Add to Claude Desktop config:
-```json
-{
-  "mcpServers": {
-    "tyomarkkinatori": {
-      "command": "node",
-      "args": ["/path/to/mcp/dist/index.js"],
-      "env": {
-        "CLIENT_ID": "your-client-id",
-        "CLIENT_SECRET": "your-client-secret",
-        "TENANT_ID": "your-tenant-id"
-      }
-    }
-  }
-}
-```
-
-## Maintenance
-
-### API Changes
-- Monitor Työmarkkinatori API documentation for updates
-- Test with QA environment before deploying changes
-- Subscribe to API changelog if available
-- Handle API versioning properly
-
-### Credential Management
-- Rotate credentials periodically
-- Monitor token expiration and refresh
-- Secure storage of client secrets
-- Never commit credentials to repository
-
-### Performance Monitoring
-- Log response times
-- Track cache hit rates
-- Monitor error rates
-- Track OAuth token refresh frequency
-- Monitor API quota usage
-
-### Updates
-- Keep dependencies updated (especially @modelcontextprotocol/sdk)
-- Test after API updates
-- Document breaking changes
-- Maintain changelog
