@@ -1,0 +1,42 @@
+# Build the binary
+build:
+	go build -o bin/tyomarkkinatori-mcp ./cmd/tyomarkkinatori-mcp
+
+# Run in development mode
+run:
+	go run ./cmd/tyomarkkinatori-mcp
+
+# Run tests
+test:
+	go test -v -race -cover ./...
+
+# Run linter
+lint:
+	golangci-lint run
+
+# Format code
+fmt:
+	go fmt ./...
+
+# Clean build artifacts
+clean:
+	rm -rf bin/
+
+# Install dependencies
+deps:
+	go mod download
+	go mod verify
+
+# Update dependencies
+update:
+	go get -u ./...
+	go mod tidy
+
+# Build for production (statically linked)
+build-prod:
+	CGO_ENABLED=0 go build -ldflags="-s -w" -o bin/tyomarkkinatori-mcp ./cmd/tyomarkkinatori-mcp
+
+# Run tests with coverage report
+test-coverage:
+	go test -v -race -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
