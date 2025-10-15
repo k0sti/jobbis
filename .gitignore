@@ -1,0 +1,17 @@
+# Environment variables and credentials
+.env
+
+# Tokens and credentials
+token.json
+credentials.json
+client_secret*.json
+
+# Build
+dist/
+build/
+out/
+
+# Other
+logs
+*.log
+.cache
