@@ -17,15 +17,13 @@ type Client struct {
 	mu          sync.RWMutex
 }
 
-// NewClient creates a new OAuth client
-func NewClient(clientID, clientSecret, tenantID string) *Client {
-	tokenURL := fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/v2.0/token", tenantID)
-
+// NewClient creates a new OAuth client with Azure AD B2C
+func NewClient(clientID, clientSecret, tokenURL, scope string) *Client {
 	config := &clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		TokenURL:     tokenURL,
-		Scopes:       []string{"https://graph.microsoft.com/.default"},
+		Scopes:       []string{scope},
 	}
 
 	return &Client{

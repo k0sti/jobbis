@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "tyomarkkinatori": {
+      "command": "/home/k0/work/jobbis/mcp-go/bin/tyomarkkinatori-mcp",
+      "env": {
+        "CLIENT_ID": "your-test-client-id-here",
+        "CLIENT_SECRET": "your-test-client-secret-here",
+        "ENVIRONMENT": "test"
+      }
+    }
+  }
+}

@@ -12,8 +12,8 @@ import (
 
 // New creates a new MCP server with registered tools
 func New(cfg *config.Config) (*mcp.Server, error) {
-	// Create OAuth client
-	oauthClient := auth.NewClient(cfg.ClientID, cfg.ClientSecret, cfg.TenantID)
+	// Create OAuth client for Azure AD B2C
+	oauthClient := auth.NewClient(cfg.ClientID, cfg.ClientSecret, cfg.TokenURL, cfg.OAuthScope)
 
 	// Create API client
 	apiClient := client.NewClient(

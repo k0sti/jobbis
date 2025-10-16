@@ -13,7 +13,11 @@ type Config struct {
 	// OAuth 2.0 credentials
 	ClientID     string
 	ClientSecret string
-	TenantID     string
+	TenantID     string // Kept for backward compatibility, not used with Azure AD B2C
+
+	// OAuth token endpoint
+	TokenURL   string
+	OAuthScope string
 
 	// API configuration
 	APIBaseURL string
@@ -31,12 +35,33 @@ type Config struct {
 
 // Load reads configuration from environment variables
 func Load() (*Config, error) {
+	environment := getEnvOrDefault("ENVIRONMENT", "production")
+	apiBaseURL := os.Getenv("API_BASE_URL")
+
+	// Set defaults based on environment
+	defaultTokenURL := "https://tedigib2c.b2clogin.com/tedigib2c.onmicrosoft.com/B2C_1A_SIGNIN/oauth2/v2.0/token"
+	defaultScope := "https://tedigib2c.onmicrosoft.com/e9343614-0f96-437e-9f5e-1d392e756675/.default"
+	defaultAPIBaseURL := "https://integraatiot.tyomarkkinatori.fi"
+
+	if environment == "test" || environment == "qa" || environment == "development" {
+		defaultTokenURL = "https://tedigidevb2c.b2clogin.com/tedigidevb2c.onmicrosoft.com/B2C_1A_SIGNIN/oauth2/v2.0/token"
+		defaultScope = "https://tedigidevb2c.onmicrosoft.com/cd93ea6e-c118-4100-b2bd-5676e1ea4c50/.default"
+		defaultAPIBaseURL = "https://integraatiot-qa.tyomarkkinatori.fi"
+	}
+
+	// Override API base URL if explicitly set
+	if apiBaseURL == "" {
+		apiBaseURL = defaultAPIBaseURL
+	}
+
 	cfg := &Config{
 		ClientID:       os.Getenv("CLIENT_ID"),
 		ClientSecret:   os.Getenv("CLIENT_SECRET"),
-		TenantID:       os.Getenv("TENANT_ID"),
-		APIBaseURL:     getEnvOrDefault("API_BASE_URL", "https://integraatiot.tyomarkkinatori.fi"),
-		Environment:    getEnvOrDefault("NODE_ENV", "production"),
+		TenantID:       os.Getenv("TENANT_ID"), // Optional, kept for backward compatibility
+		TokenURL:       getEnvOrDefault("TOKEN_URL", defaultTokenURL),
+		OAuthScope:     getEnvOrDefault("OAUTH_SCOPE", defaultScope),
+		APIBaseURL:     apiBaseURL,
+		Environment:    environment,
 		CacheTTL:       getDurationOrDefault("CACHE_TTL_MS", 15*time.Minute),
 		RateLimitRPS:   getFloat64OrDefault("RATE_LIMIT_RPS", 2.0),
 		RateLimitBurst: getIntOrDefault("RATE_LIMIT_BURST", 10),
@@ -60,9 +85,7 @@ func (c *Config) Validate() error {
 	if c.ClientSecret == "" {
 		errs = append(errs, "CLIENT_SECRET is required")
 	}
-	if c.TenantID == "" {
-		errs = append(errs, "TENANT_ID is required")
-	}
+	// TenantID is optional for Azure AD B2C
 
 	if len(errs) > 0 {
 		return fmt.Errorf("missing required environment variables:\n  - %s\n\nPlease set these in your .env file",

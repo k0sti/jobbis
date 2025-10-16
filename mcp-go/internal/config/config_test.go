@@ -70,6 +70,7 @@ func TestConfig_Load_MissingClientSecret(t *testing.T) {
 }
 
 func TestConfig_Load_MissingTenantID(t *testing.T) {
+	// TenantID is now optional for Azure AD B2C
 	os.Setenv("CLIENT_ID", "test-id")
 	os.Setenv("CLIENT_SECRET", "test-secret")
 	defer func() {
@@ -77,12 +78,17 @@ func TestConfig_Load_MissingTenantID(t *testing.T) {
 		os.Unsetenv("CLIENT_SECRET")
 	}()
 
-	_, err := Load()
-	if err == nil {
-		t.Error("Expected error when TENANT_ID is missing")
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load should succeed without TENANT_ID: %v", err)
 	}
-	if !strings.Contains(err.Error(), "TENANT_ID") {
-		t.Errorf("Error should mention TENANT_ID: %v", err)
+
+	// Should have default TokenURL and OAuthScope
+	if cfg.TokenURL == "" {
+		t.Error("Expected TokenURL to be set")
+	}
+	if cfg.OAuthScope == "" {
+		t.Error("Expected OAuthScope to be set")
 	}
 }
 
@@ -126,7 +132,7 @@ func TestConfig_Load_CustomValues(t *testing.T) {
 	os.Setenv("CLIENT_SECRET", "test-secret")
 	os.Setenv("TENANT_ID", "test-tenant")
 	os.Setenv("API_BASE_URL", "https://custom-api.example.com")
-	os.Setenv("NODE_ENV", "development")
+	os.Setenv("ENVIRONMENT", "development")
 	os.Setenv("CACHE_TTL_MS", "60000") // 1 minute
 	os.Setenv("RATE_LIMIT_RPS", "5.5")
 	os.Setenv("RATE_LIMIT_BURST", "20")
@@ -135,7 +141,7 @@ func TestConfig_Load_CustomValues(t *testing.T) {
 		os.Unsetenv("CLIENT_SECRET")
 		os.Unsetenv("TENANT_ID")
 		os.Unsetenv("API_BASE_URL")
-		os.Unsetenv("NODE_ENV")
+		os.Unsetenv("ENVIRONMENT")
 		os.Unsetenv("CACHE_TTL_MS")
 		os.Unsetenv("RATE_LIMIT_RPS")
 		os.Unsetenv("RATE_LIMIT_BURST")
@@ -198,13 +204,12 @@ func TestConfig_Validate(t *testing.T) {
 			errorText:   "CLIENT_SECRET",
 		},
 		{
-			name: "Missing TenantID",
+			name: "Missing TenantID is OK",
 			cfg: Config{
 				ClientID:     "id",
 				ClientSecret: "secret",
 			},
-			expectError: true,
-			errorText:   "TENANT_ID",
+			expectError: false,
 		},
 		{
 			name:        "All missing",
